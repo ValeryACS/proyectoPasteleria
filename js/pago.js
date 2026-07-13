@@ -34,7 +34,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     mostrarMetodoPago();
-        const botonConfirmar = document.getElementById("btnConfirmarPago");
+    const numeroTarjeta = document.getElementById("numeroTarjeta");
+    const vencimiento = document.getElementById("vencimiento");
+    const cvv = document.getElementById("cvv");
+    const telefono = document.getElementById("telefono");
+
+    numeroTarjeta.addEventListener("input", function () {
+        let numeros = this.value.replace(/\D/g, "").slice(0, 16);
+        this.value = numeros.replace(/(\d{4})(?=\d)/g, "$1 ");
+    });
+
+    vencimiento.addEventListener("input", function () {
+        let numeros = this.value.replace(/\D/g, "").slice(0, 4);
+
+        if (numeros.length > 2) {
+            this.value = numeros.slice(0, 2) + "/" + numeros.slice(2);
+        } else {
+            this.value = numeros;
+        }
+    });
+
+    cvv.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 4);
+    });
+
+    telefono.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 8);
+    });
+    const botonConfirmar = document.getElementById("btnConfirmarPago");
 
     botonConfirmar.addEventListener("click", function () {
         const nombre = document.getElementById("nombre").value.trim();
