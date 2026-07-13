@@ -108,5 +108,15 @@ document.addEventListener("DOMContentLoaded", function () {
         alert(
             "Pago confirmado correctamente. Su pedido ha sido registrado."
         );
+
+        localStorage.setItem("admin_nombre", nombre);
+        localStorage.setItem("admin_correo", correo);
+        localStorage.setItem("admin_telefono", telefono);
+        localStorage.setItem("admin_direccion", direccion);
+        localStorage.setItem("admin_metodo", metodoSeleccionado);
+
+        alert(
+            "Pago confirmado correctamente. Su pedido ha sido registrado."
+        );
     });
-})
+});
