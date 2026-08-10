@@ -1,116 +1,73 @@
+/* css/carrito.css */
+
 .cart-sidebar {
     position: fixed;
     top: 0;
-    right: -400px; 
-    width: 400px;
+    right: -450px; /* Oculto fuera de la pantalla */
+    width: 380px;
     height: 100vh;
     background-color: #ffffff;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.15);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+    transition: right 0.3s ease-in-out;
     z-index: 1050;
-    transition: right 0.3s ease-in-out; 
     display: flex;
     flex-direction: column;
+    padding: 20px;
 }
 
-
-.cart-sidebar.open {
-    right: 0;
+/* Esta es la clase que activa JavaScript cuando abres el carrito */
+.cart-sidebar.active {
+    right: 0 !important; /* Desliza el panel a la vista */
 }
-
 
 .cart-sidebar-header {
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
 }
-
-.cart-sidebar-header h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #333333;
-}
-
 
 .close-cart-btn {
-    background: none;
+    background: transparent;
     border: none;
     font-size: 1.8rem;
     line-height: 1;
-    color: #6c757d;
     cursor: pointer;
-    transition: color 0.2s;
+    color: #333;
 }
-
-.close-cart-btn:hover {
-    color: #dc3545;
-}
-
 
 .cart-body {
-    padding: 20px;
     flex-grow: 1;
-    overflow-y: auto; 
+    overflow-y: auto;
+    margin-top: 15px;
 }
-
-.empty-cart-text {
-    text-align: center;
-    color: #6c757d;
-    margin-top: 50px;
-    font-style: italic;
-}
-
-
-.cart-item {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
 
 .cart-sidebar-footer {
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
 }
 
 .total-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    font-size: 1.2rem;
     font-weight: bold;
+    font-size: 1.2rem;
     margin-bottom: 15px;
 }
 
-
 .btn-checkout {
-    display: block;
     width: 100%;
-    padding: 12px;
-    background-color: #ffb7c5;
-    color: #ffffff;
+    background-color: #ff5ca8;
+    color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 1rem;
+    padding: 12px;
+    border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-checkout:hover:not(:disabled) {
-    background-color: #ff9cae;
 }
 
 .btn-checkout:disabled {
-    background-color: #e9ecef;
-    color: #adb5bd;
+    background-color: #cccccc;
     cursor: not-allowed;
-}
-
-
-.text-rosa {
-    color: #ff9cae;
 }

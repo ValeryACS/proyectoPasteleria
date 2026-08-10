@@ -1,97 +1,136 @@
+// js/cart-front.js
 
 class CartManager {
     constructor() {
-        this.items = [];
-        this.total = 0;
+        this.cart = JSON.parse(localStorage.getItem('carrito')) || [];
+        this.init();
     }
 
-  toggleSidebar(show) {
-        const sidebar = document.getElementById('cart-sidebar');
-        if (!sidebar) return;
+    init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.updateUI();
 
-        if (show) {
-            sidebar.classList.add('open');
-        } else {
-            sidebar.classList.remove('open');
-        }
+            // VINCULAR BOTÓN DE CHECKOUT DEL SIDEBAR
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', () => {
+                    if (this.cart.length > 0) {
+                        const totalCalculado = this.calculateTotal();
+                        
+                        // 1. Guardar en localStorage para que pago.html y admin.html lo lean
+                        localStorage.setItem('totalPedido', totalCalculado);
+                        localStorage.setItem('productosPedido', JSON.stringify(this.cart));
+                        
+                        // 2. Redirigir a la pantalla de pago
+                        window.location.href = 'pago.html';
+                    }
+                });
+            }
+        });
     }
 
     addItem(id, name, price) {
-        const existingItem = this.items.find(item => item.id === id);
+        const existingItem = this.cart.find(item => item.id === id);
 
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
-            this.items.push({
+            this.cart.push({
                 id: id,
                 name: name,
-                price: price,
+                price: Number(price),
                 quantity: 1
             });
         }
 
-         this.updateUI();
+        this.saveCart();
+        this.updateUI();
         this.toggleSidebar(true);
     }
 
-   
-    removeItem(id) {
-        this.items = this.items.filter(item => item.id !== id);
+    changeQuantity(id, amount) {
+        const item = this.cart.find(i => i.id === id);
+        if (item) {
+            item.quantity += amount;
+            if (item.quantity <= 0) {
+                this.removeItem(id);
+                return;
+            }
+        }
+        this.saveCart();
         this.updateUI();
     }
 
-    
-     
+    removeItem(id) {
+        this.cart = this.cart.filter(item => item.id !== id);
+        this.saveCart();
+        this.updateUI();
+    }
+
+    saveCart() {
+        localStorage.setItem('carrito', JSON.stringify(this.cart));
+    }
+
+    calculateTotal() {
+        return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    }
+
+    countItems() {
+        return this.cart.reduce((count, item) => count + item.quantity, 0);
+    }
+
+    toggleSidebar(open) {
+        const sidebar = document.getElementById('cart-sidebar');
+        if (sidebar) {
+            if (open) {
+                sidebar.classList.add('active');
+            } else {
+                sidebar.classList.remove('active');
+            }
+        }
+    }
+
     updateUI() {
-        const cartItemsList = document.getElementById('cart-items-list');
         const cartBadge = document.getElementById('cart-badge');
-        const cartTotalPrice = document.getElementById('cart-total-price');
-        const checkoutBtn = document.getElementById('checkout-btn');
-
-        if (!cartItemsList) return;
-
-     
-        cartItemsList.innerHTML = '';
-
-      
-        if (this.items.length === 0) {
-            cartItemsList.innerHTML = '<p class="empty-cart-text">No has agregado delicias aún.</p>';
-            if (cartBadge) cartBadge.innerText = '0';
-            if (cartTotalPrice) cartTotalPrice.innerText = '₡0';
-            if (checkoutBtn) checkoutBtn.disabled = true;
-            return;
+        if (cartBadge) {
+            cartBadge.textContent = this.countItems();
         }
 
-     
-        this.total = 0;
-        let totalCount = 0;
+        const cartList = document.getElementById('cart-items-list');
+        if (cartList) {
+            if (this.cart.length === 0) {
+                cartList.innerHTML = '<p class="empty-cart-text text-center text-muted my-4">No has agregado delicias aún.</p>';
+            } else {
+                let html = '';
+                this.cart.forEach(item => {
+                    html += `
+                        <div class="cart-item d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <div>
+                                <h6 class="mb-0 fw-bold">${item.name}</h6>
+                                <small class="text-muted">₡${item.price.toLocaleString("es-CR")} c/u</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="cartManager.changeQuantity(${item.id}, -1)">-</button>
+                                <span class="fw-bold">${item.quantity}</span>
+                                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="cartManager.changeQuantity(${item.id}, 1)">+</button>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2 ms-1" onclick="cartManager.removeItem(${item.id})">&times;</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                cartList.innerHTML = html;
+            }
+        }
 
-        this.items.forEach(item => {
-            const itemSubtotal = item.price * item.quantity;
-            this.total += itemSubtotal;
-            totalCount += item.quantity;
+        const totalPriceEl = document.getElementById('cart-total-price');
+        if (totalPriceEl) {
+            totalPriceEl.textContent = '₡' + this.calculateTotal().toLocaleString("es-CR");
+        }
 
-            const itemRow = document.createElement('div');
-            itemRow.className = 'cart-item d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom';
-            itemRow.innerHTML = `
-                <div class="cart-item-info">
-                    <h6 class="mb-0 fw-bold">${item.name}</h6>
-                    <small class="text-muted">₡${item.price.toLocaleString('es-CR')} x ${item.quantity}</small>
-                </div>
-                <div class="d-flex align-items-center">
-                    <span class="me-3 fw-bold text-rosa">₡${itemSubtotal.toLocaleString('es-CR')}</span>
-                    <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="cartManager.removeItem(${item.id})">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            `;
-            cartItemsList.appendChild(itemRow);
-        });
-
-       
-        if (cartBadge) cartBadge.innerText = totalCount;
-        if (cartTotalPrice) cartTotalPrice.innerText = `₡${this.total.toLocaleString('es-CR')}`;
-        if (checkoutBtn) checkoutBtn.disabled = false;
+        const checkoutBtn = document.getElementById('checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.disabled = this.cart.length === 0;
+        }
     }
 }
 
